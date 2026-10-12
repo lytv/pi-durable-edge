@@ -22,9 +22,9 @@ test('refuse SSRF-prone and non-HTTPS model endpoints', () => {
   }
 });
 test('reject malformed tokens and unsupported APIs', () => {
-  assert.throws(() => validateModelConfig({ ...example, contextWindow: 2 }), /上下文窗口/);
-  assert.throws(() => validateModelConfig({ ...example, api: 'openai-unknown' }), /仅支持/);
-  assert.throws(() => validateModelConfig({ ...example, maxTokens: 999999 }), /最大输出/);
+  assert.throws(() => validateModelConfig({ ...example, contextWindow: 2 }), /Context window/);
+  assert.throws(() => validateModelConfig({ ...example, api: 'openai-unknown' }), /Only/);
+  assert.throws(() => validateModelConfig({ ...example, maxTokens: 999999 }), /Max output/);
 });
 test('AES-GCM API keys are not stored as plaintext and require matching deployment secret', async () => {
   const raw = 'sk-live-testing-placeholder-do-not-use';

@@ -28,7 +28,7 @@ const checkpointWait = defineTool({
     while (Date.now() < deadline) {
       await sleep(Math.min(900, Math.max(1, deadline - Date.now())), context.abortSignal);
     }
-    return { content: [{ type: 'text', text: '已到达原定截止时间，任务继续执行。' }] };
+    return { content: [{ type: 'text', text: 'The scheduled deadline has passed; the task continues.' }] };
   },
 });
 
@@ -43,7 +43,7 @@ export function fauxScript(context) {
       { stopReason: 'toolUse' },
     );
   }
-  return fauxAssistantMessage('任务完成：Pi Durable 已保存任务检查点并继续执行。本次未调用真实 AI 模型。');
+  return fauxAssistantMessage('Task complete: Pi Durable saved the task checkpoint and continued. No real AI model was called.');
 }
 
 function extractText(record) {
@@ -71,7 +71,7 @@ export class Assistant extends Agent {
     registry.install(defineExtension({
       name: 'pi-durable-edge',
       tools: [checkpointWait],
-      sections: [{ key: 'preamble', render: () => '你是 Pi Durable Edge 助手。使用简体中文，准确、简洁地回答。需要短暂等待时可以使用 checkpoint_wait；不需要等待的普通聊天请直接回答。', tag: false }],
+      sections: [{ key: 'preamble', render: () => 'You are the Pi Durable Edge assistant. Answer accurately and concisely in English. Use checkpoint_wait when a short wait is needed; answer ordinary chat directly without waiting.', tag: false }],
     }));
     this.harness = new PiHarness({
       harness: ({ storage, context }) => {
@@ -108,7 +108,7 @@ export class Assistant extends Agent {
 
   async decryptSavedKey() {
     const row = this.readModelRow();
-    if (!row?.secret) throw new ClientError('未配置模型 API Key');
+    if (!row?.secret) throw new ClientError('Model API key is not configured');
     return openKey(row.secret, this.env.ACCESS_TOKEN);
   }
 
@@ -120,14 +120,14 @@ export class Assistant extends Agent {
   async saveModelSettings(raw) {
     // DO RPC calls may interleave at an await. Guard the model transition and
     // reject new chats until both the Pi session model and persisted config agree.
-    if (this.modelUpdating) throw new ClientError('正在更新模型配置，请稍后重试', 409);
+    if (this.modelUpdating) throw new ClientError('Model configuration is being updated, please retry shortly', 409);
     this.modelUpdating = true;
     try {
       const config = validateModelConfig(raw);
       const pending = await this.harness.pending();
-      if (pending.length) throw new ClientError('当前还有未完成任务，请完成后再切换模型', 409);
+      if (pending.length) throw new ClientError('There are unfinished tasks; finish them before switching models', 409);
       const session = await this.harness.session();
-      if (await session.busy()) throw new ClientError('Agent 正在执行，请完成后再切换模型', 409);
+      if (await session.busy()) throw new ClientError('The agent is still running; finish it before switching models', 409);
 
       const old = this.readModelRow();
       const oldConfig = old ? JSON.parse(old.config) : DEFAULT_CONFIG;
@@ -136,24 +136,24 @@ export class Assistant extends Agent {
         const newKey = typeof raw.apiKey === 'string' ? raw.apiKey.trim() : '';
         if (newKey) {
           if (newKey.length < 8 || newKey.length > 8192) {
-            throw new ClientError('API Key 长度需为 8–8192 字符');
+            throw new ClientError('API key must be 8–8192 characters');
           }
           secret = await sealKey(newKey, this.env.ACCESS_TOKEN);
         } else if (old?.secret && oldConfig.api === config.api && oldConfig.baseUrl === config.baseUrl) {
           // A rotated ACCESS_TOKEN cannot decrypt the old row. Catch this now,
           // not in a background model call after the form reports success.
           try { await openKey(old.secret, this.env.ACCESS_TOKEN); }
-          catch { throw new ClientError('已有模型 Key 无法解密，请重新填写 API Key'); }
+          catch { throw new ClientError('The saved model key cannot be decrypted; please re-enter the API key'); }
           secret = old.secret;
         } else {
-          throw new ClientError('首次配置或更换接口地址时，必须填写 API Key');
+          throw new ClientError('An API key is required for first-time setup or when changing the endpoint address');
         }
       }
 
       const model = config.api === 'faux'
         ? this.fauxModel
         : (() => {
-            if (!this.models) throw new Error('Pi 模型注册表尚未初始化');
+            if (!this.models) throw new Error('Pi model registry is not initialized yet');
             const configured = configuredProvider(config, () => this.decryptSavedKey());
             this.models.setProvider(configured.provider);
             return configured.model;
@@ -196,9 +196,9 @@ export class Assistant extends Agent {
   }
 
   async startChat(text, operationId) {
-    if (this.modelUpdating) throw new ClientError('正在切换模型，请稍后发送消息', 409);
-    if (typeof text !== 'string' || text.trim().length < 1 || text.length > 4000) throw new ClientError('消息长度须为 1–4000 字');
-    if (typeof operationId !== 'string' || !/^[a-zA-Z0-9_-]{8,80}$/.test(operationId)) throw new ClientError('operationId 格式错误');
+    if (this.modelUpdating) throw new ClientError('The model is being switched; please send your message shortly', 409);
+    if (typeof text !== 'string' || text.trim().length < 1 || text.length > 4000) throw new ClientError('Message must be 1–4000 characters');
+    if (typeof operationId !== 'string' || !/^[a-zA-Z0-9_-]{8,80}$/.test(operationId)) throw new ClientError('Invalid operationId format');
     const receipt = await this.harness.submit(text.trim(), { operationId });
     return { operationId: receipt.operationId, accepted: receipt.accepted };
   }
@@ -216,8 +216,8 @@ export class Assistant extends Agent {
   }
 
   async createReminder(text, seconds) {
-    if (typeof text !== 'string' || !text.trim() || text.length > 200) throw new ClientError('提醒内容须为 1–200 字');
-    if (!Number.isInteger(seconds) || seconds < 5 || seconds > 3600) throw new ClientError('延迟必须在 5–3600 秒之间');
+    if (typeof text !== 'string' || !text.trim() || text.length > 200) throw new ClientError('Reminder text must be 1–200 characters');
+    if (!Number.isInteger(seconds) || seconds < 5 || seconds > 3600) throw new ClientError('Delay must be between 5 and 3600 seconds');
     this.ensureTable();
     const id = crypto.randomUUID();
     const dueAt = Date.now() + seconds * 1000;
@@ -256,8 +256,8 @@ export default {
   async fetch(request, env) {
     const url = new URL(request.url);
     if (!url.pathname.startsWith('/api/')) return env.ASSETS.fetch(request);
-    if (!env.ACCESS_TOKEN || env.ACCESS_TOKEN.length < 24) return json({ error: '尚未配置 ACCESS_TOKEN（至少 24 字符）' }, 503);
-    if (!authenticate(request, env.ACCESS_TOKEN)) return json({ error: '访问令牌无效' }, 401);
+    if (!env.ACCESS_TOKEN || env.ACCESS_TOKEN.length < 24) return json({ error: 'ACCESS_TOKEN is not configured (at least 24 characters required)' }, 503);
+    if (!authenticate(request, env.ACCESS_TOKEN)) return json({ error: 'Invalid access token' }, 401);
     try {
       const agent = env.Assistant.getByName('owner');
       if (request.method === 'GET' && url.pathname === '/api/state') return json(await agent.snapshot());

@@ -1,45 +1,45 @@
 # Pi Durable Edge
 
-基于 **Cloudflare Workers + SQLite-backed Durable Objects + PiHarness** 的持久化个人 Agent。独立维护的 Cloudflare 版本，源自 [Pi Durable Assistant](https://github.com/xiaomoBoy/pi-durable-assistant)。
+A durable personal agent built on **Cloudflare Workers + SQLite-backed Durable Objects + PiHarness**. An independently maintained Cloudflare edition, derived from [Pi Durable Assistant](https://github.com/xiaomoBoy/pi-durable-assistant).
 
 [![Deploy to Cloudflare](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/xiaomoBoy/pi-durable-edge)
 
-**[中文部署教程](docs/DEPLOY.md)** · [发布审查与测试矩阵](docs/RELEASE_CHECKLIST.md) · [后续路线图](docs/V02_PLAN.md)
+**[Deploy guide](docs/DEPLOY.md)** · [Release review and test matrix](docs/RELEASE_CHECKLIST.md) · [Follow-up roadmap](docs/V02_PLAN.md)
 
-> **v0.2.1**：已通过单元测试、Wrangler 打包和本地 Durable Object HTTP 集成测试；Cloudflare 账户的远端部署、真实 OpenAI/Anthropic API 和崩溃恢复仍待实测。
+> **v0.2.1**: covered by unit tests, Wrangler bundling, and local Durable Object HTTP integration tests; remote deployment on a Cloudflare account, real OpenAI/Anthropic APIs, and crash recovery still await live verification.
 
-## 功能
+## Features
 
-- **原版 UI**：复用 Pi Durable Assistant 的三栏布局、消息气泡、响应式样式和“小 D”吉祥物。
-- **模型配置**：OpenAI Chat Completions / Responses、Anthropic Messages 和 Faux；支持 HTTPS Base URL、API Key、模型 ID、上下文窗口、输出 Token 和推理标记。API Key 在服务端加密保存，配置查询不会返回明文。
-- **持久聊天**：通过 PiHarness 提交消息并保存记录，可刷新后继续查看。
-- **持久定时提醒**：Cloudflare Agents Scheduler 到期唤醒，网页上记录提醒状态。
-- **免费验证**：Faux 采用固定脚本，延迟 12 秒后回复；不调用收费模型。真实模型产生的费用由对应 API 提供商收取。
+- **Original UI**: reuses the Pi Durable Assistant three-column layout, message bubbles, responsive styles, and the "Xiao-D" mascot.
+- **Model settings**: OpenAI Chat Completions / Responses, Anthropic Messages, and Faux; supports HTTPS Base URL, API Key, model ID, context window, output tokens, and a reasoning flag. API keys are stored encrypted on the server; config reads never return plaintext.
+- **Durable chat**: submits messages through PiHarness and persists the transcript, so it survives a refresh.
+- **Durable scheduled reminders**: the Cloudflare Agents Scheduler wakes on expiry, and the page records the reminder status.
+- **Free verification**: Faux runs a fixed script and replies after a 12-second delay; it never calls a paid model. Charges from real models are billed by the corresponding API provider.
 
-当前为单用户、单 Durable Object；多会话、子 Agent、附件、停止任务和微信桥尚未实现，UI 不显示无对应后端能力的操作入口。
+Currently single-user with a single Durable Object; multi-session, sub-agents, attachments, task cancellation, and a WeChat bridge are not implemented yet, and the UI shows no controls without a matching backend capability.
 
-## 新建部署：先决定是否需要再创建 GitHub 副本
+## Fresh deploy: first decide whether to create another GitHub copy
 
-**自己已经有 `xiaomoBoy/pi-durable-edge` 仓库（项目维护者，推荐）：**不要点击上方部署按钮重复复制仓库。到 Cloudflare 控制台 **Workers & Pages → Create application → Import a repository**，选择 `xiaomoBoy/pi-durable-edge`，`main` 分支，根目录 `/`，部署命令 `npm run deploy`。这样连接的是当前仓库，之后 push 自动触发正常构建。
+**You already own the `xiaomoBoy/pi-durable-edge` repo (maintainer, recommended):** do not click the deploy button above to copy the repo again. Go to the Cloudflare dashboard **Workers & Pages → Create application → Import a repository**, pick `xiaomoBoy/pi-durable-edge`, the `main` branch, root directory `/`, and deploy command `npm run deploy`. That connects the current repo, and later pushes trigger normal builds automatically.
 
-**其他用户（真正的一键部署）：**点击上面的 **Deploy to Cloudflare**，授权 GitHub 并部署。官方按钮**会在你的 GitHub 账户创建一个新的仓库副本**，再为其创建 Worker 和 Durable Object；这不是对已有构建的“重试”。<a href="https://developers.cloudflare.com/workers/platform/deploy-buttons/">Cloudflare 官方说明</a>。
+**Everyone else (true one-click deploy):** click **Deploy to Cloudflare** above, authorize GitHub, and deploy. The official button **creates a new copy of the repo under your GitHub account**, then creates a Worker and Durable Object for it; it is not a "retry" of an existing build. <a href="https://developers.cloudflare.com/workers/platform/deploy-buttons/">Cloudflare's official explanation</a>.
 
-首次部署请填写自己生成的 **`ACCESS_TOKEN`**（至少 24 字符的随机字符串）。如果部署界面未提示填写，在 Worker 的 **Settings → Variables and Secrets** 添加 Secret `ACCESS_TOKEN`，不要用 GitHub Token/Cloudflare Token 代替。
+On first deploy, fill in your own generated **`ACCESS_TOKEN`** (a random string of at least 24 characters). If the deploy screen does not ask for it, add a Secret named `ACCESS_TOKEN` under the Worker's **Settings → Variables and Secrets**; do not substitute a GitHub token or Cloudflare token.
 
-完成后打开 Cloudflare 给出的 `workers.dev` 地址，输入同一个 `ACCESS_TOKEN`；在 Faux 模式点击 **一键功能自检**。再按需在右侧模型配置中添加自己的 API。
+When done, open the `workers.dev` address Cloudflare gives you, enter the same `ACCESS_TOKEN`, and click **One-click self-check** in Faux mode. Then add your own API under the model settings on the right as needed.
 
-**重要：**从一键部署按钮创建的第一条构建是 `seed_repo override`，不能用 **Retry build** 重跑。新代码应提交到它**实际关联的 GitHub 仓库**，由新 commit 触发构建。完整说明、授权修复及 Wrangler 备用方案见 [部署教程](docs/DEPLOY.md)。
+**Important:** the first build created from the one-click deploy button is a `seed_repo override` and cannot be re-run with **Retry build**. New code should be committed to the GitHub repo it is **actually linked to**, and a new commit triggers the build. See the [deploy guide](docs/DEPLOY.md) for the full explanation, auth fixes, and the Wrangler fallback.
 
-## v0.2.1 质量审查
+## v0.2.1 quality review
 
-- 限制 JSON 请求体到 16 KiB；无效输入在 Durable Object RPC 跨边界后仍返回正确 4xx。
-- 模型切换加互斥和回滚；自定义 API Base URL 禁止 HTTP、IP 和本地域名。
-- 模型 Key 加密并隐藏，内部运行错误脱敏；静态页面新增同源 CSP 和禁缓存响应头。
-- CI 增加真正的 **Wrangler 本地 Worker / Durable Object** HTTP 测试，覆盖 Faux 对话、幂等、Alarm 和无付费请求的模型配置切换。
+- JSON request bodies limited to 16 KiB; invalid input still returns the correct 4xx after crossing the Durable Object RPC boundary.
+- Model switching guarded by a mutex with rollback; custom API Base URLs forbid HTTP, IP, and local domains.
+- Model keys encrypted and redacted, internal runtime errors scrubbed; static pages gained a same-origin CSP and no-cache response headers.
+- CI now runs real **Wrangler local Worker / Durable Object** HTTP tests covering Faux chats, idempotency, alarms, and model-config switching with no paid requests.
 
-[完整回归清单、风险与远端测试步骤](docs/RELEASE_CHECKLIST.md)。
+[Full regression list, risks, and remote test steps](docs/RELEASE_CHECKLIST.md).
 
-## 本地验证
+## Local verification
 
 ```bash
 git clone https://github.com/xiaomoBoy/pi-durable-edge.git
@@ -47,18 +47,18 @@ cd pi-durable-edge
 npm install
 npm run check
 cp .dev.vars.example .dev.vars
-# 将 .dev.vars 内 ACCESS_TOKEN 换成至少 24 字符的个人随机密钥
+# Replace the ACCESS_TOKEN inside .dev.vars with a personal random key of at least 24 characters
 npm run dev
 ```
 
-## API（均须携带 `Authorization: Bearer <ACCESS_TOKEN>`）
+## API (all require `Authorization: Bearer <ACCESS_TOKEN>`)
 
-| 路由 | 用途 |
+| Route | Purpose |
 | --- | --- |
-| `GET /api/state` | 聊天记录、运行任务、提醒 |
-| `GET /api/model` | 获取不含明文密钥的模型配置 |
-| `PUT /api/model` | 保存并启用模型 |
-| `POST /api/chat` | 提交幂等任务：`text`、`operationId` |
-| `POST /api/reminders` | 提交延迟提醒：`text`、`seconds` |
+| `GET /api/state` | Chat transcript, running tasks, reminders |
+| `GET /api/model` | Model config without the plaintext key |
+| `PUT /api/model` | Save and enable a model |
+| `POST /api/chat` | Submit an idempotent task: `text`, `operationId` |
+| `POST /api/reminders` | Submit a delayed reminder: `text`, `seconds` |
 
-平台免费额度受 Workers、Durable Objects 和数据库资源限制；PiHarness Beta 兼容性需要线上测试。新部署的 Durable Object 是新数据空间，旧 Worker 删除后的历史记录不能自动恢复。
+The platform free quota is bound by Workers, Durable Objects, and database resources; PiHarness Beta compatibility needs online testing. A newly deployed Durable Object is a fresh data space: history from a deleted Worker does not restore automatically.

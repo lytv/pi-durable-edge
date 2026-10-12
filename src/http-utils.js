@@ -16,15 +16,15 @@ const decoder = new TextDecoder('utf-8', { fatal: true });
 export async function readJsonObject(request, maxBytes = 16 * 1024) {
   const contentType = request.headers.get('content-type') || '';
   if (!/^application\/json(?:\s*;|\s*$)/i.test(contentType)) {
-    throw new ClientError('请求必须使用 application/json', 415);
+    throw new ClientError('Requests must use application/json', 415);
   }
   const headerLength = Number(request.headers.get('content-length'));
   if (Number.isFinite(headerLength) && headerLength > maxBytes) {
-    throw new ClientError('请求体过大', 413);
+    throw new ClientError('Request body too large', 413);
   }
 
   const reader = request.body?.getReader();
-  if (!reader) throw new ClientError('请求体不能为空');
+  if (!reader) throw new ClientError('Request body must not be empty');
   let size = 0;
   const chunks = [];
   try {
@@ -34,7 +34,7 @@ export async function readJsonObject(request, maxBytes = 16 * 1024) {
       size += value.byteLength;
       if (size > maxBytes) {
         await reader.cancel();
-        throw new ClientError('请求体过大', 413);
+        throw new ClientError('Request body too large', 413);
       }
       chunks.push(value);
     }
@@ -51,10 +51,10 @@ export async function readJsonObject(request, maxBytes = 16 * 1024) {
   try {
     data = JSON.parse(decoder.decode(bytes));
   } catch {
-    throw new ClientError('请求不是合法 JSON 对象');
+    throw new ClientError('Request is not a valid JSON object');
   }
   if (!data || typeof data !== 'object' || Array.isArray(data)) {
-    throw new ClientError('请求体必须是 JSON 对象');
+    throw new ClientError('Request body must be a JSON object');
   }
   return data;
 }
@@ -67,8 +67,8 @@ export function publicError(error) {
     (error?.name === 'ClientError' && error?.code === 'PI_EDGE_CLIENT_ERROR_V1');
   if (isClientError && [400, 409, 413, 415].includes(error.status)) {
     const message = typeof error.message === 'string' && error.message.length <= 250
-      ? error.message : '请求参数无效';
+      ? error.message : 'Invalid request parameters';
     return { status: error.status, message };
   }
-  return { status: 500, message: '请求未完成。请检查 Workers 日志、运行额度与服务连接。' };
+  return { status: 500, message: 'Request did not complete. Check the Workers logs, usage quota, and service connections.' };
 }

@@ -31,7 +31,7 @@ function unbase64(text) {
 
 async function cryptoKey(accessToken) {
   if (typeof accessToken !== 'string' || accessToken.length < 24) {
-    throw new Error('ACCESS_TOKEN 未配置或长度不足');
+    throw new Error('ACCESS_TOKEN is not configured or is too short');
   }
   const bits = await crypto.subtle.digest('SHA-256', enc.encode('pi-durable-edge:model-settings:v1:' + accessToken));
   return crypto.subtle.importKey('raw', bits, 'AES-GCM', false, ['encrypt', 'decrypt']);
@@ -44,24 +44,24 @@ export async function sealKey(apiKey, accessToken) {
 }
 export async function openKey(sealed, accessToken) {
   const [version, nonce, value] = String(sealed).split('.');
-  if (version !== 'v1' || !nonce || !value) throw new Error('无法读取已保存密钥');
+  if (version !== 'v1' || !nonce || !value) throw new Error('Cannot read the saved key');
   const decrypted = await crypto.subtle.decrypt({ name: 'AES-GCM', iv: unbase64(nonce) }, await cryptoKey(accessToken), unbase64(value));
   return dec.decode(decrypted);
 }
 
 export function validateModelConfig(raw) {
-  if (!raw || typeof raw !== 'object' || Array.isArray(raw)) throw new ClientError('模型配置无效');
+  if (!raw || typeof raw !== 'object' || Array.isArray(raw)) throw new ClientError('Invalid model configuration');
   const api = String(raw.api || 'faux');
   if (api === 'faux') return { ...DEFAULT_CONFIG };
-  if (!(api in ENDPOINTS)) throw new ClientError('仅支持 OpenAI Completions、OpenAI Responses、Anthropic Messages');
+  if (!(api in ENDPOINTS)) throw new ClientError('Only OpenAI Completions, OpenAI Responses, and Anthropic Messages are supported');
   const model = String(raw.model ?? '').trim();
-  if (!model || model.length > 160 || /[\u0000-\u001f]/.test(model)) throw new ClientError('模型 ID 必须为 1–160 个有效字符');
+  if (!model || model.length > 160 || /[\u0000-\u001f]/.test(model)) throw new ClientError('Model ID must be 1–160 valid characters');
   const suppliedBaseUrl = String(raw.baseUrl || ENDPOINTS[api]).trim();
-  if (suppliedBaseUrl.length > 500) throw new ClientError('Base URL 长度不能超过 500');
+  if (suppliedBaseUrl.length > 500) throw new ClientError('Base URL must not exceed 500 characters');
   let url;
-  try { url = new URL(suppliedBaseUrl); } catch { throw new ClientError('Base URL 无效'); }
+  try { url = new URL(suppliedBaseUrl); } catch { throw new ClientError('Invalid Base URL'); }
   if (url.protocol !== 'https:' || url.username || url.password || url.search || url.hash) {
-    throw new ClientError('Base URL 必须是 HTTPS 地址，不能包含账号、密码、查询参数或 #');
+    throw new ClientError('Base URL must be an HTTPS address without username, password, query parameters, or #');
   }
   // URL() canonicalizes numeric IPv4 aliases (127.1, 2130706433, 0x7f000001).
   // Reject all literal IP targets and local-only DNS names: this is a BYO HTTPS
@@ -73,13 +73,13 @@ export function validateModelConfig(raw) {
     hostname === 'metadata.google.internal' ||
     ['.localhost', '.local', '.internal', '.lan', '.home', '.test'].some((suffix) => hostname.endsWith(suffix));
   if (ipLiteral || localName || !hostname.includes('.')) {
-    throw new ClientError('Base URL 必须是公共 HTTPS 域名，不能使用 IP、localhost 或本地网络域名');
+    throw new ClientError('Base URL must be a public HTTPS domain; IP addresses, localhost, and local network domains are not allowed');
   }
   const contextWindow = Number(raw.contextWindow);
   const maxTokens = Number(raw.maxTokens);
-  if (!Number.isInteger(contextWindow) || contextWindow < 4096 || contextWindow > 2000000) throw new ClientError('上下文窗口需为 4096–2000000');
-  if (!Number.isInteger(maxTokens) || maxTokens < 128 || maxTokens > contextWindow) throw new ClientError('最大输出 Token 需为 128 到上下文窗口大小');
-  if (typeof raw.reasoning !== 'boolean') throw new ClientError('推理能力必须是布尔值');
+  if (!Number.isInteger(contextWindow) || contextWindow < 4096 || contextWindow > 2000000) throw new ClientError('Context window must be 4096–2000000');
+  if (!Number.isInteger(maxTokens) || maxTokens < 128 || maxTokens > contextWindow) throw new ClientError('Max output tokens must be between 128 and the context window size');
+  if (typeof raw.reasoning !== 'boolean') throw new ClientError('Reasoning must be a boolean');
   return { api, baseUrl: url.toString().replace(/\/$/, ''), model, reasoning: raw.reasoning, contextWindow, maxTokens };
 }
 
@@ -104,7 +104,7 @@ export function configuredProvider(config, getApiKey) {
       signal?.throwIfAborted();
       const key = await getApiKey();
       signal?.throwIfAborted();
-      if (!key) throw new Error('API Key 缺失：请前往模型配置页面');
+      if (!key) throw new Error('API key is missing: please open the model settings page');
       return { auth: { apiKey: key }, source: 'encrypted Durable Object setting' };
     } } },
     models: [model], api: APIS[config.api],

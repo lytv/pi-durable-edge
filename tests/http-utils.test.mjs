@@ -15,18 +15,18 @@ test('JSON parser rejects arrays, bad JSON and invalid UTF-8', async () => {
 });
 test('JSON parser enforces content type and actual byte size', async () => {
   await assert.rejects(() => readJsonObject(req('{}', { 'content-type': 'text/plain' })), { status: 415 });
-  await assert.rejects(() => readJsonObject(req(JSON.stringify({ text: '中'.repeat(500) })), 300), { status: 413 });
+  await assert.rejects(() => readJsonObject(req(JSON.stringify({ text: 'x'.repeat(500) })), 300), { status: 413 });
 });
 test('status mapping never leaks unexpected provider error messages', () => {
   const internal = publicError(new Error('sk-should-not-be-disclosed'));
   assert.equal(internal.status, 500);
   assert.equal(internal.message.includes('sk-should-not-be-disclosed'), false);
-  const client = publicError(new ClientError('输入错误'));
-  assert.deepEqual(client, { status: 400, message: '输入错误' });
+  const client = publicError(new ClientError('input error'));
+  assert.deepEqual(client, { status: 400, message: 'input error' });
 });
 
 test('reconstructed Durable Object RPC client errors preserve safe HTTP status', () => {
-  const remote = { name: 'ClientError', code: 'PI_EDGE_CLIENT_ERROR_V1', status: 400, message: '消息长度须为 1–4000 字' };
+  const remote = { name: 'ClientError', code: 'PI_EDGE_CLIENT_ERROR_V1', status: 400, message: 'Message must be 1–4000 characters' };
   assert.deepEqual(publicError(remote), { status: 400, message: remote.message });
   assert.equal(publicError({ ...remote, code: 'fake' }).status, 500);
   assert.equal(publicError({ ...remote, status: 500 }).status, 500);
