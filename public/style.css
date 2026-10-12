@@ -1,4 +1,4 @@
-/* CSS 变量体系：升级活力靛紫渐变，适配深色模式 */
+/* CSS variable system: vibrant indigo-violet gradient, dark-mode ready */
 :root {
   --bg-page: #f8fafc;
   --bg-surface: #ffffff;
@@ -10,7 +10,7 @@
   --text-muted: #64748b;
   --text-light: #94a3b8;
 
-  /* 主题色：活力靛蓝到紫罗兰渐变 */
+  /* Theme colors: vibrant indigo-to-violet gradient */
   --primary: #4f46e5;
   --primary-hover: #4338ca;
   --primary-gradient: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
@@ -95,7 +95,7 @@
   }
 }
 
-/* 基础重置与页面背景 */
+/* Base reset and page background */
 * {
   box-sizing: border-box;
   margin: 0;
@@ -121,7 +121,7 @@ button, input, textarea {
   font-size: 14px;
 }
 
-/* 动画与过渡支持 */
+/* Animation and transition support */
 .fade-in {
   animation: fadeIn 0.25s ease-out forwards;
 }
@@ -139,7 +139,7 @@ button, input, textarea {
   }
 }
 
-/* 顶部断线重连横条 */
+/* Top offline-reconnect banner */
 .reconnect-banner {
   position: fixed;
   top: 0;
@@ -171,7 +171,7 @@ button, input, textarea {
   to { transform: rotate(360deg); }
 }
 
-/* 主布局 */
+/* Main layout */
 .app-layout {
   display: flex;
   width: 100vw;
@@ -179,13 +179,13 @@ button, input, textarea {
   overflow: hidden;
 }
 
-/* 移动端顶部标题导航条（桌面端隐藏） */
+/* Mobile top title nav bar (hidden on desktop) */
 .mobile-header {
   display: none;
 }
 
 /* =========================================================
-   左栏：会话列表
+   Left column: session list
    ========================================================= */
 .sidebar-left {
   width: 280px;
@@ -429,7 +429,7 @@ button, input, textarea {
   line-height: 1.55;
 }
 @media (hover: hover) and (pointer: fine) {
-  /* 当前列表里，没选中的行把操作留到悬停。归档列表的主要动作就是恢复和删除，一直显示。 */
+  /* In the current list, unselected rows reveal actions on hover. The archive list's main actions are restore and delete, always shown. */
   .conversation-list:not(.is-archived-view) .conversation-item:not(.active):not(.is-confirming) > .conv-actions {
     opacity: 0;
   }
@@ -440,7 +440,7 @@ button, input, textarea {
 }
 
 /* =========================================================
-   中栏：消息流和输入区
+   Middle column: message stream and input area
    ========================================================= */
 .chat-column {
   flex: 1;
@@ -471,7 +471,7 @@ button, input, textarea {
   color: var(--text-muted);
 }
 
-/* 子 Agent 会话顶部提示栏 */
+/* Sub-agent session top notice bar */
 .subagent-parent-banner {
   background: var(--purple-bg);
   border-bottom: 1px solid var(--primary-border);
@@ -504,7 +504,7 @@ button, input, textarea {
   gap: 16px;
 }
 
-/* 空会话示例卡片区 */
+/* Empty-session example card area */
 .empty-chat-state {
   display: flex;
   flex-direction: column;
@@ -577,7 +577,7 @@ button, input, textarea {
   color: var(--text-muted);
 }
 
-/* 消息条目 */
+/* Message entries */
 .no-anim { animation: none !important; }
 .assistant-bubble.md { white-space: normal; }
 .md > :first-child { margin-top: 0; }
@@ -709,13 +709,13 @@ button, input, textarea {
   font-size: 10.5px;
   opacity: 0.85;
 }
-/* 只保留用户自己输入的换行；气泡本身不用 pre-wrap，否则模板里的缩进会变成空行 */
+/* Keep only the user's own line breaks; bubbles don't use pre-wrap, otherwise template indentation becomes blank lines */
 .user-text-body {
   word-break: break-word;
   white-space: pre-wrap;
 }
 
-/* 桌面端任务中心按钮放在左侧会话栏底部的空白处，不压住右侧面板 */
+/* On desktop the task-center button sits in the blank space at the bottom of the left session bar, without covering the right panel */
 @media (min-width: 861px) {
   #v3-toggle {
     left: 16px !important;
@@ -731,7 +731,7 @@ button, input, textarea {
   }
 }
 
-/* 定时提醒系统卡片（居中呈现，非用户气泡） */
+/* Scheduled-reminder system card (centered, not a user bubble) */
 .reminder-system-row {
   justify-content: center;
   margin: 6px 0;
@@ -757,7 +757,7 @@ button, input, textarea {
   word-break: break-word;
 }
 
-/* 错误系统卡片（居中呈现） */
+/* Error system card (centered) */
 .error-system-row {
   justify-content: center;
   margin: 8px 0;
@@ -826,7 +826,7 @@ button, input, textarea {
   box-shadow: var(--shadow-sm);
 }
 
-/* 工具与子 Agent 卡片 */
+/* Tool and sub-agent cards */
 .tool-card {
   background-color: var(--tool-bg);
   border: 1px solid var(--tool-border);
@@ -912,7 +912,7 @@ button, input, textarea {
   text-decoration: underline;
 }
 
-/* 子 Agent 卡片内跳转链接 */
+/* Jump links inside sub-agent cards */
 .subagent-jump-link {
   display: inline-flex;
   align-items: center;
@@ -928,7 +928,7 @@ button, input, textarea {
   text-decoration: underline;
 }
 
-/* 流式生成与思考中 */
+/* Streaming generation and thinking state */
 .live-bubble {
   display: inline-flex;
   align-items: center;
@@ -965,7 +965,7 @@ button, input, textarea {
   80%, 100% { transform: translateY(0); opacity: 0.4; }
 }
 
-/* 拖拽上传提示遮罩 */
+/* Drag-and-drop upload hint overlay */
 .drop-overlay {
   position: absolute;
   inset: 0;
@@ -1002,7 +1002,7 @@ button, input, textarea {
   color: var(--text-muted);
 }
 
-/* 待发送附件预览 */
+/* Pending attachment preview */
 .attachments-preview {
   display: flex;
   flex-wrap: wrap;
@@ -1071,7 +1071,7 @@ button, input, textarea {
   background: var(--danger-bg);
 }
 
-/* 底部输入框区 */
+/* Bottom input area */
 .input-container {
   padding: 14px 20px;
   border-top: 1px solid var(--border);
@@ -1202,7 +1202,7 @@ button, input, textarea {
   transform: none;
 }
 
-/* 全局轻提示 Toast */
+/* Global lightweight toast */
 .toast-container {
   position: fixed;
   top: 24px;
@@ -1252,7 +1252,7 @@ button, input, textarea {
 }
 
 /* =========================================================
-   右栏：吉祥物小 D、记事本、提醒、任务、状态
+   Right column: mascot Xiao-D, notepad, reminders, tasks, status
    ========================================================= */
 .sidebar-right {
   width: 330px;
@@ -1272,7 +1272,7 @@ button, input, textarea {
   width: 100%;
 }
 
-/* v3 任务中心按钮全局美化 */
+/* v3 task-center button global styling */
 #v3-toggle {
   background: var(--primary-gradient) !important;
   color: #ffffff !important;
@@ -1313,7 +1313,7 @@ button, input, textarea {
   border-bottom: 1px solid var(--border);
 }
 
-/* --- 吉祥物小 D 卡片 --- */
+/* --- Mascot Xiao-D card --- */
 .mascot-card {
   position: relative;
   background: linear-gradient(180deg, var(--bg-surface) 0%, var(--bg-subtle) 100%);
@@ -1324,7 +1324,7 @@ button, input, textarea {
   text-align: center;
 }
 
-/* 对话气泡 */
+/* Chat bubbles */
 .mascot-bubble {
   position: relative;
   background: var(--bg-surface);
@@ -1404,14 +1404,14 @@ button, input, textarea {
   color: var(--text-muted);
 }
 
-/* 小 D 状态表现与 CSS 动画 */
+/* Xiao-D state presentation and CSS animations */
 .d-expr-idle, .d-expr-disconnected, .d-expr-recovered, .d-expr-waiting,
 .d-expr-tool, .d-expr-thinking, .d-expr-reminder, .d-expr-error,
 .d-smoke, .d-zzz, .d-prop-tool, .d-prop-clock, .d-wave-pulse {
   display: none;
 }
 
-/* 1. 断线状态 */
+/* 1. Disconnected state */
 [data-state="disconnected"] .d-expr-disconnected,
 [data-state="disconnected"] .d-smoke {
   display: block;
@@ -1439,7 +1439,7 @@ button, input, textarea {
 .d-smoke circle:nth-child(2) { animation: xdSmoke 1.4s 0.4s infinite ease-out; }
 .d-smoke circle:nth-child(3) { animation: xdSmoke 1.4s 0.8s infinite ease-out; }
 
-/* 2. 刚恢复状态 */
+/* 2. Just-recovered state */
 [data-state="recovered"] .d-expr-recovered {
   display: block;
 }
@@ -1455,7 +1455,7 @@ button, input, textarea {
   50% { transform: translateY(-10px) scale(1.05); }
 }
 
-/* 3. 等待中状态 */
+/* 3. Waiting state */
 [data-state="waiting"] .d-expr-waiting,
 [data-state="waiting"] .d-zzz {
   display: block;
@@ -1479,7 +1479,7 @@ button, input, textarea {
 .d-zzz text:nth-child(1) { animation: xdZzz 1.8s infinite ease-out; }
 .d-zzz text:nth-child(2) { animation: xdZzz 1.8s 0.6s infinite ease-out; }
 
-/* 4. 用工具状态 */
+/* 4. Tool-using state */
 [data-state="tool"] .d-expr-tool,
 [data-state="tool"] .d-prop-tool {
   display: block;
@@ -1507,7 +1507,7 @@ button, input, textarea {
   to { fill: #fde047; filter: drop-shadow(0 0 7px #eab308); }
 }
 
-/* 5. 思考中状态 */
+/* 5. Thinking state */
 [data-state="thinking"] .d-expr-thinking,
 [data-state="thinking"] .d-wave-pulse {
   display: block;
@@ -1532,7 +1532,7 @@ button, input, textarea {
   100% { opacity: 0; transform: scale(1.6); }
 }
 
-/* 6. 有提醒状态 */
+/* 6. Reminder state */
 [data-state="reminder"] .d-expr-reminder,
 [data-state="reminder"] .d-prop-clock {
   display: block;
@@ -1551,7 +1551,7 @@ button, input, textarea {
   75% { transform: translate(66px, 62px) scale(0.85) rotate(10deg); }
 }
 
-/* 7. 空闲状态 */
+/* 7. Idle state */
 [data-state="idle"] .d-expr-idle {
   display: block;
 }
@@ -1575,7 +1575,7 @@ button, input, textarea {
   96% { transform: scaleY(0.1); }
 }
 
-/* 8. 出错状态 */
+/* 8. Error state */
 [data-state="error"] .d-expr-error {
   display: block;
 }
@@ -1591,7 +1591,7 @@ button, input, textarea {
   50% { transform: translateY(2px); }
 }
 
-/* --- 记事本 --- */
+/* --- Notepad --- */
 .notes-section {
   display: flex;
   flex-direction: column;
@@ -1641,7 +1641,7 @@ button, input, textarea {
   font-style: italic;
 }
 
-/* --- 定时提醒面板 --- */
+/* --- Reminder panel --- */
 .reminder-list {
   display: flex;
   flex-direction: column;
@@ -1698,7 +1698,7 @@ button, input, textarea {
   color: var(--text-muted);
 }
 
-/* --- 持久任务面板（树状缩进） --- */
+/* --- Durable task panel (tree indent) --- */
 .task-tree {
   display: flex;
   flex-direction: column;
@@ -1761,7 +1761,7 @@ button, input, textarea {
   color: var(--purple);
 }
 
-/* --- 运行状态 --- */
+/* --- Runtime status --- */
 .stat-list {
   display: flex;
   flex-direction: column;
@@ -1799,7 +1799,7 @@ button, input, textarea {
   50% { transform: scale(1.15); background-color: var(--success-bg); color: var(--success); }
 }
 
-/* 模拟崩溃按钮 */
+/* Simulated-crash button */
 .btn-crash {
   width: 100%;
   padding: 10px;
@@ -1820,7 +1820,7 @@ button, input, textarea {
   color: #ffffff;
 }
 
-/* 二次确认弹窗 */
+/* Second-confirmation dialog */
 .modal-overlay {
   position: fixed;
   inset: 0;
@@ -1885,7 +1885,7 @@ button, input, textarea {
   background-color: var(--danger-hover);
 }
 
-/* 抽屉遮罩 */
+/* Drawer backdrop */
 .drawer-backdrop {
   display: none;
   position: fixed;
@@ -1895,7 +1895,7 @@ button, input, textarea {
 }
 
 /* =========================================================
-   移动端响应式适配（单栏，手机宽度 390px 友好）
+   Mobile responsive adaptation (single column, friendly at 390px phone width)
    ========================================================= */
 @media (max-width: 860px) {
   html, body {
@@ -1912,7 +1912,7 @@ button, input, textarea {
     overflow-x: hidden;
   }
 
-  /* 移动端顶部条 */
+  /* Mobile top bar */
   .mobile-header {
     display: flex;
     align-items: center;
@@ -1948,7 +1948,7 @@ button, input, textarea {
     position: relative;
   }
 
-  /* 手机顶部的小 D 挂件：只显示表情，点一下弹出气泡 */
+  /* Phone-top Xiao-D widget: shows only the face; tap to pop the bubble */
   .mobile-mascot-btn {
     background: var(--bg-subtle);
     border: 1px solid var(--primary-border);
@@ -2005,7 +2005,7 @@ button, input, textarea {
     border-color: transparent transparent var(--bg-surface);
   }
 
-  /* 左栏抽屉化 */
+  /* Left column as drawer */
   .sidebar-left {
     position: fixed;
     top: 0;
@@ -2027,7 +2027,7 @@ button, input, textarea {
     z-index: 2550;
   }
 
-  /* 中栏桌面端标题隐藏 */
+  /* Middle-column desktop title hidden */
   .chat-header {
     display: none;
   }
@@ -2088,12 +2088,12 @@ button, input, textarea {
     max-height: 180px;
   }
 
-  /* 移动端示例按钮单列 */
+  /* Mobile example buttons in one column */
   .example-prompts-grid {
     grid-template-columns: 1fr;
   }
 
-  /* 移动端分叉按钮 */
+  /* Mobile fork buttons */
   .user-row {
     flex-direction: column;
     align-items: flex-end;
@@ -2107,7 +2107,7 @@ button, input, textarea {
     margin-top: 4px;
   }
 
-  /* 右栏排在对话下方，底部留出空间 */
+  /* Right column below the conversation, with space left at the bottom */
   .sidebar-right {
     width: 100%;
     height: auto;
@@ -2117,7 +2117,7 @@ button, input, textarea {
     overflow-y: visible;
   }
 
-  /* 移动端任务中心悬浮按钮位于底部吸附输入栏上方，绝不遮挡发送按钮 */
+  /* Mobile task-center floating button sits above the bottom-docked input bar, never covering the send button */
   #v3-toggle {
     top: 64px !important;
     bottom: auto !important;

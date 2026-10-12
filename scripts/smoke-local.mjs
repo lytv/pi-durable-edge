@@ -102,7 +102,7 @@ async function main() {
     if (s.status !== 200) throw new Error('state HTTP ' + s.status);
     const i = s.body.messages.findLastIndex(m => m.role === 'user' && m.text.includes(operationId));
     const replied = i >= 0 && s.body.messages.slice(i + 1).some(m =>
-      m.role === 'assistant' && m.text.includes('任务完成：Pi Durable'));
+      m.role === 'assistant' && m.text.includes('Task complete: Pi Durable'));
     const fired = s.body.reminders.some(m => m.id === reminderId && m.status === 'fired');
     return replied && fired;
   }, 60000, 'Faux durable chat and reminder alarm');
